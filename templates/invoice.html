@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .invoice-wrapper {
+            width: 800px;
+            margin: 0 auto;
+            padding: 40px 40px 30px;
+        }
+        h1, h2, h3, h4, h5 {
+            margin: 0;
+            font-weight: 500;
+        }
+        .top-bar {
+            border-bottom: 2px solid #e5e5e5;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+        .top-row {
+            width: 100%;
+            overflow: hidden;
+        }
+        .company-block {
+            float: left;
+            width: 60%;
+        }
+        .company-name {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        .company-address,
+        .company-contact {
+            margin-top: 0.5px;
+            line-height: 1.4;
+        }
+        .logo-block {
+            float: right;
+            text-align: right;
+        }
+        .logo-block img {
+            max-width: 220px;
+            height: 100px;
+        }
+
+        .title-row {
+            width: 100%;
+            margin-top: 18px;
+            overflow: hidden;
+        }
+        .invoice-title {
+            float: right;
+            text-align: right;
+            font-size: 30px;
+            letter-spacing: 2px;
+        }
+        .invoice-info-card {
+            float: right;
+            text-align: left;
+            background: #f7f5f1;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 15px;
+            margin-right: 40px;
+        }
+        .invoice-info-card table {
+            border-collapse: collapse;
+        }
+        .invoice-info-card td {
+            padding: 2px 6px 2px 0;
+        }
+        .invoice-info-label {
+            color: #777;
+            padding-right: 8px;
+        }
+        .invoice-info-value {
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .section {
+            margin-top: 22px;
+        }
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #555;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .bill-row {
+            width: 100%;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .bill-to {
+            float: left;
+            width: 60%;
+        }
+        .bill-label {
+            font-weight: 600;
+        }
+        .bill-name {
+            margin-top: 3px;
+            font-weight: 600;
+        }
+        .bill-address {
+            margin-top: 3px;
+        }
+        .bill-phone {
+            margin-top: 3px;
+        }
+
+        .items-header {
+            margin-top: 26px;
+            border-top: 1px solid #d3d3d3;
+            padding-top: 10px;
+        }
+        .items-header-row {
+            width: 100%;
+            overflow: hidden;
+            font-size: 16px;
+            text-transform: uppercase;
+            color: #555;
+        }
+        .col-items      { float: left; width: 45%; }
+        .col-qty        { float: left; width: 12%; text-align: center; }
+        .col-unit       { float: left; width: 15%; text-align: right; }
+        .col-tax        { float: left; width: 12%; text-align: right; line-height: 1.4;}
+        .col-subtotal   { float: left; width: 14%; text-align: right; }
+        .tax-label {
+            font-size: 14px;
+            color: #999;
+            display: block;
+        }
+
+        .item-row {
+            width: 100%;
+            overflow: hidden;
+            padding: 10px 0 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .item-meta {
+            font-size: 16px;
+            line-height: 1.4;
+            color: #666;
+        }
+        .item-meta span {
+            display: inline-block;
+            min-width: 45px;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .small-red {
+            color: #c0392b;
+            font-size: 14px;
+        }
+        .strike {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .summary-rows {
+            margin-top: 8px;
+            font-size: 16px;
+        }
+        .summary-row {
+            width: 100%;
+            overflow: hidden;
+            padding: 3px 0;
+        }
+        .summary-label {
+            float: left;
+            width: 60%;
+            font-weight: 600;
+        }
+        .summary-amount {
+            float: left;
+            width: 26%;
+            text-align: right;
+        }
+        .summary-total {
+            float: left;
+            width: 14%;
+            text-align: right;
+        }
+
+        .bottom-row {
+            width: 100%;
+            overflow: hidden;
+            margin-top: 26px;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 16px;
+        }
+        .payment-block {
+            float: left;
+            width: 50%;
+            font-size: 16px;
+        }
+        .payment-block h4 {
+            font-size: 16px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            
+        }
+        .support-block {
+            margin-top: 18px;
+        }
+        .support-block h4 {
+        font-size: 16px;
+        margin-bottom: 6px;
+        font-weight: 600;
+        }
+
+        .totals-block {
+            float: right;
+            width: 40%;
+            font-size: 14px;
+        }
+        .totals-block table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .totals-block td {
+            padding: 2px 0;
+        }
+        .totals-label {
+            text-align: left;
+        }
+        .totals-value {
+            text-align: right;
+            min-width: 80px;
+        }
+        .totals-strong td {
+            padding-top: 6px;
+            font-weight: 600;
+        }
+        .muted {
+            color: #777;
+        }
+        .negative {
+            color: #c0392b;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 200px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="invoice-wrapper">
+
+    <!-- 顶部公司信息 & Logo -->
+    <div class="top-bar">
+        <div class="top-row">
+            <div class="company-block">
+                <div class="company-name">{{ company.name }}</div>
+                <div class="company-address">
+                    {{ company.address }}
+                </div>
+                <div class="company-contact">
+                    {{ company.email }}<br>
+                    {{ company.phone }}
+                </div>
+            </div>
+            <div class="logo-block">
+                {% if company.logo_path %}
+                    <img src="{{ company.logo_path }}" alt="Logo">
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="title-row">
+            <div class="invoice-title">
+                INVOICE
+            </div>
+            <div class="invoice-info-card">
+                <table>
+                    <tr>
+                        <td class="invoice-info-label">Issue Date</td>
+                        <td class="invoice-info-value">{{ invoice.issue_date }}</td>
+                    </tr>
+                    <tr>
+                        <td class="invoice-info-label">Invoice Number</td>
+                        <td class="invoice-info-value">{{ invoice.invoice_number }}</td>
+                    </tr>
+                    <tr>
+                        <td class="invoice-info-label">ABN</td>
+                        <td class="invoice-info-value">{{ company.abn }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill to -->
+    <div class="section">
+        <div class="bill-row">
+            <div class="bill-to">
+                <div class="section-title">Bill to</div>
+                <div class="bill-name">{{ invoice.bill_to_name }}</div>
+                <div class="bill-address">
+                    {{ invoice.bill_to_address | replace('\n', '<br>') | safe }}
+                </div>
+                {% if invoice.bill_to_phone %}
+                <div class="bill-phone">
+                    {{ invoice.bill_to_phone }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Items 表头 -->
+    <div class="items-header">
+        <div class="items-header-row">
+            <div class="col-items">Items</div>
+            <div class="col-qty">Quantity</div>
+            <div class="col-unit">Unit Price</div>
+            <div class="col-tax">
+                Tax
+                <span class="tax-label">Included</span>
+            </div>
+            <div class="col-subtotal">Subtotal</div>
+        </div>
+    </div>
+
+    <!-- 每一行商品 -->
+    {% for item in items %}
+    <div class="item-row">
+        <div class="col-items">
+            <div class="item-title">{{ item.description }}</div>
+            <div class="item-meta">
+                {% if item.colour %}<span>Colour:</span> {{ item.colour }}<br>{% endif %}
+                {% if item.size %}<span>Size:</span> {{ item.size }}<br>{% endif %}
+                {% if item.materials %}<span>Materials:</span> {{ item.materials }}{% endif %}
+            </div>
+        </div>
+        <div class="col-qty text-center">
+            x {{ item.quantity|int }}
+        </div>
+        <div class="col-unit text-right">
+            {% if item.discount_note %}
+                <div class="small-red">{{ item.discount_note }}</div>
+            {% endif %}
+            {% if item.original_price %}
+                <div class="strike">
+                    {{ company.currency }} {{ "{:,.2f}".format(item.original_price) }}
+                </div>
+            {% endif %}
+            <div>
+                {{ company.currency }} {{ "{:,.2f}".format(item.unit_price) }}
+            </div>
+        </div>
+        <div class="col-tax text-right">
+            {{ company.currency }} {{ "{:,.2f}".format(item.line_tax) }}
+        </div>
+        <div class="col-subtotal text-right">
+            {{ company.currency }} {{ "{:,.2f}".format(item.line_total) }}
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Promotion / Shipping -->
+    <div class="summary-rows">
+        <div class="summary-row">
+            <div class="summary-label">Promotion</div>
+            <div class="summary-amount"></div>
+            <div class="summary-total text-right">
+                {% if invoice.promotion %}
+                    -{{ company.currency }} {{ "{:,.2f}".format(invoice.promotion) }}
+                {% else %}
+                    {{ company.currency }} 0.00
+                {% endif %}
+            </div>
+        </div>
+        <div class="summary-row">
+            <div class="summary-label">Shipping fee</div>
+            <div class="summary-amount"></div>
+            <div class="summary-total text-right">
+                {{ company.currency }} {{ "{:,.2f}".format(invoice.shipping_fee) }}
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 Payment / Totals -->
+    <div class="bottom-row">
+        <div class="payment-block">
+            <h4>Payment Method</h4>
+            <div class="muted">
+                {{ invoice.payment_method }}
+            </div>
+
+            <div class="support-block">
+                <h4>Support</h4>
+                <div>{{ company.email }}</div>
+                <div>{{ company.phone }}</div>
+            </div>
+        </div>
+
+        <div class="totals-block">
+            <table>
+                <tr>
+                    <td class="totals-label">Subtotal</td>
+                    <td class="totals-value">
+                        {{ company.currency }} {{ "{:,.2f}".format(invoice.subtotal) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="totals-label">Tax Included</td>
+                    <td class="totals-value">
+                        {{ company.currency }} {{ "{:,.2f}".format(invoice.tax_total) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="totals-label">Discount</td>
+                    <td class="totals-value negative">
+                        -{{ company.currency }} {{ "{:,.2f}".format(invoice.promotion) }}
+                    </td>
+                </tr>
+                <tr class="totals-strong">
+                    <td class="totals-label">Total</td>
+                    <td class="totals-value">
+                        {{ company.currency }} {{ "{:,.2f}".format(invoice.total) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="totals-label">Voucher</td>
+                    <td class="totals-value negative">
+                        -{{ company.currency }} {{ "{:,.2f}".format(invoice.voucher) }}
+                    </td>
+                </tr>
+                <tr class="totals-strong">
+                    <td class="totals-label">Paid by customer</td>
+                    <td class="totals-value">
+                        {{ company.currency }} {{ "{:,.2f}".format(invoice.paid_by_customer) }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        {{ company.name }}<br>
+        {{ company.address }}<br>
+        {{ company.email }}
+    </div>
+
+</div>
+</body>
+</html>
